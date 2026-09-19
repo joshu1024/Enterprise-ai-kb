@@ -33,7 +33,7 @@ export default function ChatPage() {
         }
     }
     return(
-       <div className="">
+       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between px-6 py-3 border-b">
             <div>
                 <h2 className="text-sm font-medium">Knowledge base chat</h2>

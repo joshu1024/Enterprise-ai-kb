@@ -32,7 +32,7 @@ export default function CitationCard({ citations, fromCache }: Props) {
           </div>
           <p className="text-muted-foreground line-clamp-2">{c.excerpt}</p>
         </div>
-      ))}
+         ))}
     </div>
   );
 }

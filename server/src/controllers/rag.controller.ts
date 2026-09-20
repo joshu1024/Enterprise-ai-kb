@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../types/index.js";
 import { streamRagResponse } from "../services/rag.service.js";
 import prisma from "../config/prisma.js";
+import { evaluateRagResponse } from "../services/rag.service.js";
 
 export const queryDocuments =async(req:AuthRequest,res:Response):Promise<void>=>{
     try {
@@ -48,14 +49,12 @@ export const getRagStats= async(req:AuthRequest,res:Response):Promise<void>=>{
     const totalTokensUsed = users.reduce((sum,u)=>sum + u.aiTokensUsed,0);
     const estimatedCost = ((totalTokensUsed / 1000000) * 0.05).toFixed(4);
 
-    res.json({documentCount,chunkCount,cacheCount,estimatedCostUsd:estimatedCost,totalTokensUsed})
+    res.json({documentCount,chunkCount,cacheCount,estimatedCostUsd:estimatedCost,totalTokensUsed,users})
     } catch (error) {
         res.status(500).json({error:"Internal server error"})
     }
 
 }
-import { evaluateRagResponse } from "../services/rag.service.js";
-
 export const evalResponse = async (
   req: AuthRequest,
   res: Response

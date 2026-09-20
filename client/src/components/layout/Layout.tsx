@@ -24,6 +24,7 @@ export default function Layout(){
     return(
         <div className="flex h-screen bg-background">
             <aside className="w-56 border-r flex flex-col">
+                
             <div className="p-4">
                 <h1 className="text-sm font-semibold">Enterprise KB</h1>
                 <p className="mt-0.5 text-muted-foreground text-xs">{user?.organizationName}</p>

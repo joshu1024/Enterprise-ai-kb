@@ -1,22 +1,50 @@
 import fs from "fs";
 import path from "path";
-import { createRequire } from "module";
 import mammoth from "mammoth";
 import * as cheerio from "cheerio";
 
-const require = createRequire(import.meta.url);
-const pdfParse = require("pdf-parse");
+import { createRequire } from "module";
+import { fileURLToPath } from "url";
+const require = createRequire(fileURLToPath(import.meta.url));
 
-export const parsePDF=async(filePath:string):Promise<string>=>{
-    const buffer = fs.readFileSync(filePath);
-    const data = await pdfParse(buffer);
-    return data.text
-}
+export const parsePDF = async (filePath: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const PDFParser = require("pdf2json");
+    const parser = new PDFParser();
+
+    parser.on("pdfParser_dataReady", (pdfData: any) => {
+      try {
+        const text = pdfData.Pages
+          .flatMap((page: any) => page.Texts)
+          .map((t: any) =>
+            t.R.map((r: any) => {
+              try {
+                return decodeURIComponent(r.T);
+              } catch {
+                return r.T; 
+              }
+            }).join("")
+          )
+          .join(" ");
+        resolve(text);
+      } catch (err) {
+        reject(err);
+      }
+    });
+
+    parser.on("pdfParser_dataError", (err: any) => {
+      reject(new Error(err.parserError));
+    });
+
+    parser.loadPDF(filePath);
+  });
+};
 
 export const parseDOCX=async(filePath:string):Promise<string>=>{
     const buffer = fs.readFileSync(filePath);
     const result = await mammoth.extractRawText({buffer});
     return result.value;
+    
 }
 export const parseHTML=(html:string):string=>{
     const $ = cheerio.load(html);

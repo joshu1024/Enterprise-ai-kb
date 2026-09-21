@@ -69,9 +69,9 @@ export default function Layout(){
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7"
+                        className="h-7 w-7 mb-2 hover:animate-pulse rounded-full"
                         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                        title="Toggle theme"
+                        title="Toggle theme "
                         >
                         {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
                         </Button>

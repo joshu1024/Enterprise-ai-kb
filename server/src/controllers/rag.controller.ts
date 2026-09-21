@@ -30,7 +30,7 @@ export const getRagStats= async(req:AuthRequest,res:Response):Promise<void>=>{
         const organizationId = req.user?.organizationId as string;
 
     const [documentCount,chunkCount,cacheCount,users] = await Promise.all([
-        prisma.document.count({where:{organizationId,status:"true"}}),
+        prisma.document.count({where:{organizationId,status:"ready"}}),
         prisma.documentChunk.count({where:{document:{organizationId}}}),
         prisma.semanticCache.count({where:{organizationId}}),
         prisma.user.findMany({

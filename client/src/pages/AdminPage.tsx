@@ -104,7 +104,15 @@ export default function AdminPage(){
                         {u.aiTokensUsed.toLocaleString()} tokens
                       </span>
 
-                    <span className="text-xs">{u.role}</span>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-md ${
+                        u.role === "admin"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-secondary-foreground"
+                      }`}
+                    >
+                      {u.role}
+                    </span>
                       
                     </div>
                   </div>

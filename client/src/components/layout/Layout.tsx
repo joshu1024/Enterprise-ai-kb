@@ -5,12 +5,14 @@ import {MessageSquare,FileText,LayoutDashboard, LogOut} from "lucide-react"
 import { Separator } from "../ui/separator";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
+import { useTheme } from "../../hooks/useTheme";
+import { Sun, Moon } from "lucide-react";
 
 export default function Layout(){
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const {user} = useAppSelector((s)=>s.auth);
-
+    const { theme, setTheme } = useTheme();
     function handleLogout(){
         dispatch(logout());
         navigate("/login")
@@ -23,9 +25,9 @@ export default function Layout(){
 
     return(
         <div className="flex h-screen bg-background">
-            <aside className="w-56 border-r flex flex-col">
-                
-            <div className="p-4">
+            <aside className="w-56 border-r flex flex-col justify-between">
+                <div>
+             <div className="p-4">
                 <h1 className="text-sm font-semibold">Enterprise KB</h1>
                 <p className="mt-0.5 text-muted-foreground text-xs">{user?.organizationName}</p>
             </div>
@@ -63,7 +65,16 @@ export default function Layout(){
                     <LogOut size={14}/>
                 </Button>
             </div>
-
+            </div>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                        title="Toggle theme"
+                        >
+                        {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
+                        </Button>
             </aside>
             <main className="flex-1 overflow-hidden">
                 <Outlet/>

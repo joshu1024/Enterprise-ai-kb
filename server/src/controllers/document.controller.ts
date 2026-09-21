@@ -4,13 +4,16 @@ import { AuthRequest } from "../types/index.js";
 import { Response } from "express";
 import { ingestDocument } from "../services/ingestion.service.js";
 import prisma from "../config/prisma.js";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const storage = multer.diskStorage({
-    destination:"/uploads/temp",
-    filename:(req,file,cb)=>{
-        const unique = `${Date.now()} - ${Math.round(Math.random() * 1e9)}`;
-        cb(null,unique + path.extname(file.originalname))
-    }
+  destination: path.join(__dirname, "../../../uploads/temp"), // relative to dist/src/controllers/
+  filename: (req, file, cb) => {
+    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, unique + path.extname(file.originalname));
+  },
 });
 export const upload = multer({
     storage,

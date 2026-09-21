@@ -5,7 +5,18 @@ import cors from "cors";
 import documentRoutes from "./routes/document.routes.js"
 import authRoutes from "./routes/auth.routes.js";
 import ragRoutes from "./routes/rag.routes.js"
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Create uploads folder on startup
+const uploadsDir = path.join(__dirname, "../../uploads/temp");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 const app = express();
 const PORT = process.env.PORT || 4000;
 

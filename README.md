@@ -299,7 +299,7 @@ App runs on **http://localhost:5173**
 
 **Joshua Kipamet Olting'idi**
 
-- 💼 [LinkedIn](#)
+- 💼 [LinkedIn](https://www.linkedin.com/in/joshua-kipamet-148698140/)
 - 💻 [GitHub @joshu1024](https://github.com/joshu1024)
 
 ---

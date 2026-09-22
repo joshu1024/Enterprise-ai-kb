@@ -1,6 +1,5 @@
 import CitationCard from "@/components/chat/CitationCard";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChat } from "@/hooks/useChat";
 import { Send, Square, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -48,7 +47,7 @@ export default function ChatPage() {
                 )
             }
         </div>
-        <ScrollArea className="flex-1 px-6 py-4">
+        <div className="flex-1 overflow-y-auto px-6 py-4">
             {
                 messages.length === 0 &&(
                     <div className="flex flex-col items-center justify-center gap-4 h-full min-w-75">
@@ -90,7 +89,7 @@ export default function ChatPage() {
                 }
                 <div ref={bottomRef}></div>
             </div>
-        </ScrollArea>
+        </div>
 
         <div className="px-6 py-4 border-t">
             <div className="max-w-2xl mx-auto flex gap-2">

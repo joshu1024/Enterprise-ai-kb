@@ -12,7 +12,7 @@ A production-ready multi-tenant RAG SaaS that lets teams upload company document
 
 ## 🌐 Live Demo
 
-- 🖥️ **Frontend (Vercel)** → [https://your-app.vercel.app](https://enterprise-ai-r0pxwonxk-joes-projects-50075601.vercel.app)
+- 🖥️ **Frontend (Vercel)** → https://your-app.vercel.app](https://enterprise-ai-r0pxwonxk-joes-projects-50075601.vercel.app
 - ⚙️ **Backend (Render)** → https://enterprise-ai-kb.onrender.com
 ---
 

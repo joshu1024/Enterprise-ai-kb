@@ -12,9 +12,8 @@ A production-ready multi-tenant RAG SaaS that lets teams upload company document
 
 ## 🌐 Live Demo
 
-- 🖥️ **Frontend (Vercel)** → coming soon
-- ⚙️ **Backend (Render)** → coming soon
-
+- 🖥️ **Frontend (Vercel)** → https://your-app.vercel.app
+- ⚙️ **Backend (Render)** → https://enterprise-ai-kb.onrender.com
 ---
 
 ## 🤖 AI Features

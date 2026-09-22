@@ -51,6 +51,9 @@ export default function RegisterPage() {
                 }
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                Users with the same email domain will automatically join your organization.
+              </p>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="name">Your name</Label>

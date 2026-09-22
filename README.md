@@ -13,8 +13,9 @@ A production-ready multi-tenant RAG SaaS that lets teams upload company document
 
 ## 🌐 Live Demo
 
-- 🖥️ **Frontend (Vercel)** →https://enterprise-ai-kb.vercel.app
+- 🖥️ **Frontend (Vercel)** → https://enterprise-ai-kb.vercel.app
 - ⚙️ **Backend (Render)** → https://enterprise-ai-kb.onrender.com
+
 ---
 
 ## 🤖 AI Features
@@ -23,7 +24,7 @@ A production-ready multi-tenant RAG SaaS that lets teams upload company document
 
 | Feature | Description | Tech |
 |---------|-------------|------|
-| Document ingestion | Upload PDF, DOCX, TXT, HTML — parsed, chunked, embedded, stored | pdf-parse, mammoth, cheerio, Cohere |
+| Document ingestion | Upload PDF, DOCX, TXT, HTML — parsed, chunked, embedded, stored | pdf2json, mammoth, cheerio, Cohere |
 | Recursive chunking | Splits on paragraphs → sentences → words. Preserves semantic boundaries | Custom implementation |
 | Vector storage | 1024-dim Cohere embeddings stored in PostgreSQL with HNSW index | pgvector + Neon |
 | HyDE retrieval | Generates hypothetical answer first, embeds that instead of raw query | Groq + Cohere |
@@ -32,19 +33,13 @@ A production-ready multi-tenant RAG SaaS that lets teams upload company document
 | Source citations | Every answer includes which document chunks it came from | Custom |
 | Streaming answers | Word-by-word SSE streaming via raw fetch (bypasses SDK limitations) | Groq + SSE |
 | Semantic caching | Near-identical queries (>0.92 similarity) served from cache — zero API cost | pgvector |
-| Multi-tenant auth | Organizations, JWT, role-based access (admin/member) | bcryptjs + JWT |
+| Multi-tenant auth | Single org per email domain — company users share org automatically | bcryptjs + JWT |
 | AI security layer | Rate limiting, prompt injection detection, per-user token quota | express-rate-limit |
 | RAG evaluation | RAGAS-style faithfulness, relevance, context recall scoring | Groq as judge |
 | Admin stats | Token usage, estimated cost, per-user breakdown | Prisma aggregation |
-| Unit tests | 19 tests — chunking, citations, injection detection, embedding parsing | Vitest |
-
-### 🔜 Coming Soon
-
-| Feature | Description |
-|---------|-------------|
-| Frontend UI | React + TypeScript + shadcn/ui — chat, document library, admin panel |
-| Document status polling | Live status updates as documents are processed |
-| Docker + CI/CD | Containerization and GitHub Actions pipeline |
+| Frontend UI | Chat with streaming citations, document library, admin panel, dark mode | React + TS + shadcn/ui |
+| CI/CD pipeline | Automated tests + build check on every push | GitHub Actions |
+| Unit tests | 51 tests — 19 backend + 32 frontend | Vitest |
 
 ---
 
@@ -86,7 +81,7 @@ Semantic cache write (background)
 | Recursive chunking | Preserves paragraph and sentence boundaries better than fixed-size. Splits on `\n\n` → `\n` → `. ` → ` ` |
 | Background ingestion | Upload response is instant — chunking and embedding run async. User gets immediate feedback |
 | Semantic caching | Repeated questions cost zero API calls. 0.92 similarity threshold balances cache hits vs answer freshness |
-| Multi-tenant by org | Every query, document, and cache entry is scoped by `organizationId` — data isolation by design |
+| Multi-tenant by domain | Users with same email domain auto-join same org. Public domains (gmail, yahoo) get personal orgs |
 
 ---
 
@@ -116,16 +111,16 @@ The full answer and citations are embedded and stored. Next time a similar quest
 ## 🧪 Tests
 
 ```bash
-npm run test:run
+# Backend
+cd server && npm run test:run
+
+# Frontend  
+cd client && npm run test:run
 ```
 
-✓ recursiveChunk — 4 tests
-✓ buildCitations — 3 tests
-✓ prompt injection detection — 5 tests
-✓ parseEmbedding — 5 tests
-✓ vectorString formatting — 2 tests
-
-19 passed
+Backend — 19 passed (chunking, citations, injection detection, embedding parsing)
+Frontend — 32 passed (auth slice, document slice, useChat, CitationCard)
+Total — 51 passed
 
 
 ---
@@ -142,20 +137,27 @@ npm run test:run
 | Neon | Serverless PostgreSQL — never suspends |
 | Cohere SDK | Text embeddings — embed-english-v3.0 |
 | Groq API | LLM inference — fast free tier |
-| Multer | File upload handling |
-| pdf-parse, mammoth, cheerio | Document parsing |
+| Multer + pdf2json + mammoth | File upload and document parsing |
 | express-rate-limit | Rate limiting on AI endpoints |
 | bcryptjs + JWT | Auth and password hashing |
 | Vitest | Unit testing |
 
-### Frontend (coming soon)
+### Frontend
 | Technology | Purpose |
 |------------|---------|
 | React + TypeScript | UI framework |
-| Redux Toolkit | Global state |
-| Tailwind CSS | Styling |
-| shadcn/ui | Component library |
+| Redux Toolkit | Global state management |
+| Tailwind CSS + shadcn/ui | Styling and components |
+| Dark mode | System preference + manual toggle |
 | Vercel | Deployment |
+
+### DevOps
+| Technology | Purpose |
+|------------|---------|
+| GitHub Actions | CI — runs 51 tests + build check on every push |
+| Render | Backend deployment |
+| Vercel | Frontend deployment |
+| Neon | Serverless PostgreSQL |
 
 ---
 
@@ -169,6 +171,7 @@ npm run test:run
 | Org scoping | Every DB query filtered by organizationId — no cross-tenant data access |
 | JWT auth | All endpoints protected — role-based admin/member access |
 | API key security | Keys in .env only — never in client code |
+| Domain-based tenancy | Company email domains auto-grouped — public domains isolated |
 
 ---
 
@@ -179,7 +182,7 @@ Organization ──< Document ──< DocumentChunk (vector embeddings)
 Organization ──< SemanticCache (cached Q&A embeddings)
 
 
-- **Organization** — top-level tenant. All data scoped here
+- **Organization** — top-level tenant, domain-based auto-grouping
 - **User** — belongs to org, role admin/member, tracks aiTokensUsed
 - **Document** — uploaded file, status (processing/ready/failed), chunkCount
 - **DocumentChunk** — parsed text chunk + 1024-dim vector embedding
@@ -192,11 +195,12 @@ Organization ──< SemanticCache (cached Q&A embeddings)
 ### 1. Clone
 ```bash
 git clone https://github.com/joshu1024/enterprise-ai-kb.git
-cd enterprise-ai-kb/server
+cd enterprise-ai-kb
 ```
 
-### 2. Install dependencies
+### 2. Backend setup
 ```bash
+cd server
 npm install
 ```
 
@@ -210,13 +214,12 @@ DATABASE_URL=your_neon_postgres_url
 JWT_SECRET=your_jwt_secret_min_32_chars
 ALLOWED_ORIGINS=http://localhost:5173
 GROQ_API_KEY=your_groq_api_key
-GROQ_MODEL=groq/compound-mini
+GROQ_MODEL=openai/gpt-oss-20b
 COHERE_API_KEY=your_cohere_api_key
 ```
 
 ### 4. Enable pgvector
 ```sql
--- Run in your Neon SQL editor
 CREATE EXTENSION IF NOT EXISTS vector;
 ```
 
@@ -228,19 +231,34 @@ npx prisma generate
 
 ### 6. Create HNSW index
 ```sql
--- Run in Neon SQL editor
 CREATE INDEX IF NOT EXISTS chunk_embedding_hnsw_idx
 ON "DocumentChunk"
 USING hnsw (embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 ```
 
-### 7. Start server
+### 7. Start backend
 ```bash
 npm run dev
 ```
 
-Server runs on **http://localhost:4000**
+### 8. Frontend setup
+```bash
+cd ../client
+npm install --legacy-peer-deps
+```
+
+Create `client/.env`:
+```env
+VITE_API_BASE_URL=http://localhost:4000
+```
+
+### 9. Start frontend
+```bash
+npm run dev
+```
+
+App runs on **http://localhost:5173**
 
 ---
 
@@ -261,23 +279,19 @@ Server runs on **http://localhost:4000**
 
 ---
 
-## 📸 Screenshots
-
-Coming soon — frontend in progress.
-
----
-
 ## ☁️ Deployment
 
 ### Backend on Render
 1. New Web Service → connect GitHub repo
 2. Root Directory: `server`
-3. Build Command: `npm install && npx prisma generate`
-4. Start Command: `npm start`
+3. Build Command: `npm install && npx prisma generate && npm run build`
+4. Start Command: `node dist/src/server.js`
 5. Add all environment variables
 
 ### Frontend on Vercel
-Coming soon.
+1. Import GitHub repo → Root Directory: `client`
+2. Install Command: `npm install --legacy-peer-deps`
+3. Add `VITE_API_BASE_URL` environment variable
 
 ---
 
@@ -297,6 +311,7 @@ Coming soon.
 - Neon — serverless PostgreSQL
 - Prisma — TypeScript ORM
 - pgvector — vector similarity in PostgreSQL
+- shadcn/ui — component library
 
 ---
 

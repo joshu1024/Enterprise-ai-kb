@@ -1,6 +1,7 @@
 # 🧠 Enterprise AI Knowledge Base
 
 A production-ready multi-tenant RAG SaaS that lets teams upload company documents and query them in natural language. Built as part of a fullstack AI engineer learning roadmap.
+
 ![CI](https://github.com/joshu1024/Enterprise-ai-kb/actions/workflows/ci.yml/badge.svg)
 ![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6)
 ![Node](https://img.shields.io/badge/Backend-Node.js-green)

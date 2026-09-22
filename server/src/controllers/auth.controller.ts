@@ -5,9 +5,10 @@ import { generateToken } from "../config/generateToken.js";
 import { error } from "node:console";
 import { AuthRequest } from "../types/index.js";
 
-const PUBLIC_DOMAINS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com"];
+
 
 export const register=async(req:Request,res:Response):Promise<void>=>{
+    const PUBLIC_DOMAINS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com"];
 try {
      const{name,email,password,organizationName} = req.body;
 
@@ -28,7 +29,12 @@ try {
 
     const existingOrg = isPublicDomain ? null : await prisma.organization.findFirst({
         where:{domain}
-    })  
+    }) 
+
+    const orgDomain = isPublicDomain
+    ? `${email.replace("@", "-at-")}-${Date.now()}.personal`
+    : domain; 
+
     let user;
    if(existingOrg){
      user =  await prisma.user.create({
@@ -45,7 +51,7 @@ try {
     const org = await prisma.organization.create({
         data: {
           name: organizationName,
-          domain, 
+          domain:orgDomain, 
           users: {
             create: {
               name,

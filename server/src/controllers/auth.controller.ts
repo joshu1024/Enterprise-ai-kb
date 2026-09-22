@@ -5,41 +5,66 @@ import { generateToken } from "../config/generateToken.js";
 import { error } from "node:console";
 import { AuthRequest } from "../types/index.js";
 
+const PUBLIC_DOMAINS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com"];
+
 export const register=async(req:Request,res:Response):Promise<void>=>{
 try {
      const{name,email,password,organizationName} = req.body;
 
     if(!name || !email || !password || !organizationName){
-        res.status(400).json({error:"All fields are required!"})
+        res.status(400).json({error:"All fields are required!"});
+        return;
     }
     const existing = await prisma.user.findUnique({where:{email}})
     if(existing){
-        res.status(400).json({error:"Email already in use"})
+        res.status(400).json({error:"Email already in use"});
+        return;
     }
 
     const hashed = await bcrypt.hash(password,10);
 
-    const org = await prisma.organization.create({
-        data:{
-            name:organizationName,
-            users:{
-                create:{
-                    name,
-                    email,
-                    password:hashed,
-                    role:"admin"
-                }
-            }
-        },
-        include:{users:true}
-    });
+    const domain = email.split("@")[1].toLowerCase();
+    const isPublicDomain = PUBLIC_DOMAINS.includes(domain);
 
-    const user = org.users[0];
+    const existingOrg = isPublicDomain ? null : await prisma.organization.findFirst({
+        where:{domain}
+    })  
+    let user;
+   if(existingOrg){
+     user =  await prisma.user.create({
+        data:{
+            name,
+            email,
+            password:hashed,
+            role:"member",
+            organizationId:existingOrg.id
+        },
+        include:{organization:true}
+    })
+   } else {
+    const org = await prisma.organization.create({
+        data: {
+          name: organizationName,
+          domain, 
+          users: {
+            create: {
+              name,
+              email,
+              password: hashed,
+              role: "admin",
+            },
+          },
+        },
+        include: { users: true },
+      });
+      user = { ...org.users[0], organization: org };
+   }
+    
     const token = generateToken({
       id:user.id,
       email:user.email,
       role:user.role,
-      organizationId:org.id
+      organizationId:user?.organizationId
     })
     res.status(201).json({
         token,
@@ -48,8 +73,8 @@ try {
             name: user.name,
             email: user.email,
             role: user.role,
-            organizationId: org.id,
-            organizationName: org.name,
+            organizationId: user.organizationId,
+            organizationName: user.organization.name,
         }
     })
 

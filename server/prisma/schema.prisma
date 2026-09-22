@@ -21,6 +21,7 @@ enum Role {
 model Organization {
   id        String     @id @default(uuid())
   name      String
+  domain    String     @unique
   users     User[]
   documents Document[]
   createdAt DateTime   @default(now())

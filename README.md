@@ -189,7 +189,15 @@ Organization ──< SemanticCache (cached Q&A embeddings)
 - **SemanticCache** — cached query + answer + citations + embedding
 
 ---
+Screenshots
+First user for that organization always admin
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1f345faf-d5f5-42f1-a108-9d4ad54c5ba5" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e7a3ef28-88bc-4a15-871f-9cb0422b14a9" />
+Second users registers for that organization and finds uploaded documents by admin for that company only.
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e1b1ab3b-077c-4b8c-81aa-c04359e88e5e" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/19ed639a-95a0-4dd2-85d1-10bf9db1538c" />
 
+---
 ## ⚙️ Installation & Setup
 
 ### 1. Clone

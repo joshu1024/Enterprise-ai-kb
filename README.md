@@ -15,7 +15,7 @@ A production-ready multi-tenant RAG SaaS that lets teams upload company document
 
 - 🖥️ **Frontend (Vercel)** → https://enterprise-ai-kb.vercel.app
 - ⚙️ **Backend (Render)** → https://enterprise-ai-kb.onrender.com
-
+> ⚠️ Free-tier hosting: the backend (Render) spins down when idle, so the first request can take up to a minute. The database (Neon) also wakes from idle in a few hundred ms.
 ---
 
 ## 🤖 AI Features
@@ -134,7 +134,7 @@ Total — 51 passed
 | TypeScript | Full type safety throughout |
 | PostgreSQL + pgvector | Relational data + vector similarity search |
 | Prisma ORM | Schema, migrations, typed queries |
-| Neon | Serverless PostgreSQL — never suspends |
+| Neon | Serverless PostgreSQL — scales to zero after 5 min idle on the free plan; wakes in a few hundred ms |
 | Cohere SDK | Text embeddings — embed-english-v3.0 |
 | Groq API | LLM inference — fast free tier |
 | Multer + pdf2json + mammoth | File upload and document parsing |
@@ -304,7 +304,17 @@ App runs on **http://localhost:5173**
 3. Add `VITE_API_BASE_URL` environment variable
 
 ---
+## ⚠️ Known Limitations & What I'd Do Next
 
+| Limitation | What I'd do next |
+|---|---|
+| Semantic cache doesn't invalidate on document update | Clear the org's cache on every upload + add a 48h TTL |
+| No end-to-end tests | Add Playwright tests for the full upload → query → citation flow |
+| Free-tier cold starts | Add a keep-alive ping or move to a paid tier |
+| pdf2json struggles with complex PDF layouts | Evaluate pdfjs-dist on newer Node versions or a paid parsing API |
+| No document versioning | Track document versions and scope cache entries to a version hash |
+| pgvector on shared PostgreSQL | Move to a dedicated instance for heavier load |
+---
 ## 🧑‍💻 Author
 
 **Joshua Kipamet Olting'idi**

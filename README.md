@@ -201,7 +201,7 @@ First user for that organization is always admin.
 Second user registers for that organization and finds documents uploaded by the admin — scoped to that company only.
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e1b1ab3b-077c-4b8c-81aa-c04359e88e5e" />
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/19ed639a-95a0-4dd2-85d1-10bf9db1538c" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/f3d1d41d-6557-473d-9de0-011cc75fca43" />
 
 ---
 

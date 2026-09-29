@@ -1,6 +1,6 @@
 # 🧠 Enterprise AI Knowledge Base
 
-A production-ready multi-tenant RAG SaaS that lets teams upload company documents and query them in natural language. Built as part of a fullstack AI engineer learning roadmap.
+A deployed multi-tenant RAG SaaS that lets teams upload company documents and query them in natural language. Built as part of a fullstack AI engineer learning roadmap.
 
 ![CI](https://github.com/joshu1024/Enterprise-ai-kb/actions/workflows/ci.yml/badge.svg)
 ![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6)
@@ -15,7 +15,9 @@ A production-ready multi-tenant RAG SaaS that lets teams upload company document
 
 - 🖥️ **Frontend (Vercel)** → https://enterprise-ai-kb.vercel.app
 - ⚙️ **Backend (Render)** → https://enterprise-ai-kb.onrender.com
+
 > ⚠️ Free-tier hosting: the backend (Render) spins down when idle, so the first request can take up to a minute. The database (Neon) also wakes from idle in a few hundred ms.
+
 ---
 
 ## 🤖 AI Features
@@ -45,18 +47,17 @@ A production-ready multi-tenant RAG SaaS that lets teams upload company document
 
 ## 🏗️ Architecture
 
-User query
-↓
-HyDE — generate hypothetical answer → embed it
-↓
-Hybrid search — vector (pgvector) + keyword (BM25) → RRF fusion
-↓
-Re-ranking — LLM scores top 10 → returns best 5
-↓
-Context injection → streaming answer with [Source N] citations
-↓
-Semantic cache write (background)
-
+```mermaid
+flowchart TD
+    Q[User query] --> C{SemanticCache<br/>similarity > 0.92?}
+    C -- hit --> H[stream cached answer<br/>zero API cost]
+    C -- miss --> Y[hydeQuery<br/>generate hypothetical answer]
+    Y --> EM[generateQueryEmbedding<br/>Cohere search_query type]
+    EM --> HS[hybridSearch<br/>vector cosine + BM25 + RRF]
+    HS --> RR[rerank<br/>LLM scores top 10 → best 5]
+    RR --> ST[stream answer<br/>with inline citations]
+    ST --> W[write semantic cache<br/>background]
+```
 
 ### Why this pipeline beats basic RAG
 
@@ -114,14 +115,13 @@ The full answer and citations are embedded and stored. Next time a similar quest
 # Backend
 cd server && npm run test:run
 
-# Frontend  
+# Frontend
 cd client && npm run test:run
 ```
 
 Backend — 19 passed (chunking, citations, injection detection, embedding parsing)
 Frontend — 32 passed (auth slice, document slice, useChat, CitationCard)
 Total — 51 passed
-
 
 ---
 
@@ -177,10 +177,11 @@ Total — 51 passed
 
 ## 🗄️ Database Schema
 
+```
 Organization ──< User
 Organization ──< Document ──< DocumentChunk (vector embeddings)
 Organization ──< SemanticCache (cached Q&A embeddings)
-
+```
 
 - **Organization** — top-level tenant, domain-based auto-grouping
 - **User** — belongs to org, role admin/member, tracks aiTokensUsed
@@ -189,17 +190,21 @@ Organization ──< SemanticCache (cached Q&A embeddings)
 - **SemanticCache** — cached query + answer + citations + embedding
 
 ---
-Screenshots
 
-First user for that organization always admin
+## 📸 Screenshots
+
+First user for that organization is always admin.
+
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1f345faf-d5f5-42f1-a108-9d4ad54c5ba5" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e7a3ef28-88bc-4a15-871f-9cb0422b14a9" />
 
-Second users registers for that organization and finds uploaded documents by admin for that company only.
+Second user registers for that organization and finds documents uploaded by the admin — scoped to that company only.
+
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e1b1ab3b-077c-4b8c-81aa-c04359e88e5e" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/19ed639a-95a0-4dd2-85d1-10bf9db1538c" />
 
 ---
+
 ## ⚙️ Installation & Setup
 
 ### 1. Clone
@@ -304,6 +309,7 @@ App runs on **http://localhost:5173**
 3. Add `VITE_API_BASE_URL` environment variable
 
 ---
+
 ## ⚠️ Known Limitations & What I'd Do Next
 
 | Limitation | What I'd do next |
@@ -314,7 +320,9 @@ App runs on **http://localhost:5173**
 | pdf2json struggles with complex PDF layouts | Evaluate pdfjs-dist on newer Node versions or a paid parsing API |
 | No document versioning | Track document versions and scope cache entries to a version hash |
 | pgvector on shared PostgreSQL | Move to a dedicated instance for heavier load |
+
 ---
+
 ## 🧑‍💻 Author
 
 **Joshua Kipamet Olting'idi**
